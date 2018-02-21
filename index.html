@@ -1,0 +1,129 @@
+<!doctype HTML>
+<html>
+
+<head>
+	<style type="text/css">
+		#canvas{
+			position: absolute;
+			left: 50%;
+			margin-left: -300px;
+			top: 50%;
+			margin-top: -300px;
+		}
+	</style>
+</head>
+
+<body>
+	
+	<canvas id="canvas" height="600px" width="600px"></canvas>
+
+	<script>
+		var c = document.getElementById("canvas");
+		var ctx = c.getContext("2d");
+
+		var color1 = '#'+ Math.random().toString(16).slice(-6);
+		var color2 = '#fff';
+
+
+
+		function column(x,y, height, width, color){
+			this.x = x;
+			this.y = y;
+			this.height = height;
+			this.width = width;
+			this.color = color;
+			this.end = 0;
+			this.goal = 0;
+			this.direction = 0;
+
+			this.changeDirection = function(){
+				switch(this.direction){
+					case 0:// down
+					case 2:// up
+						this.goal = this.height;
+						break;
+					case 1:// right
+					case 3:// left
+						this.goal = this.width;
+						break;
+				}	
+			}
+			this.changeDirection();
+
+			this.update = function(){
+				ctx.fillStyle = this.color;
+
+				if(this.end > this.goal){
+
+					if(this.color == color1){
+						this.color = color2;
+					}
+					else{
+						this.color = color1;
+					}
+
+					if(this.direction < 3){
+						this.direction += 1;
+					}
+					else{
+						this.direction = 0;
+					}
+
+					this.changeDirection();
+
+					this.end = 0;
+				}
+
+				switch(this.direction){
+					case 0:
+						ctx.fillRect(x,y,this.width,this.end);
+						break;
+					case 1:
+						ctx.fillRect(x,y,this.end,this.height);
+						break;
+					case 2:
+						ctx.fillRect(x,this.height,this.width,-this.end);
+						break;
+					case 3:
+						ctx.fillRect(x+this.width,y,-this.end,this.height);
+						break;
+				}
+				switch(this.direction){
+						case 0:// down
+						case 2:// up
+							this.end += 15;
+							break;
+						case 1:// right
+						case 3:// left
+							this.end += 3;
+							break;
+					}
+			}
+		}
+
+		var columnArray = [];
+		var columnWidth = 60;
+
+		for(var i = 0; i < c.width/columnWidth;i++){
+			if(i%2 == 0){
+				columnArray.push(new column(i*columnWidth,0,c.height,columnWidth,color1));
+			}
+			else{
+				columnArray.push(new column(i*columnWidth,0,c.height,columnWidth,color2));
+			}
+		}
+
+		fill();
+
+		function fill(){
+			requestAnimationFrame(fill);
+
+			for(var i = 0; i < columnArray.length; i++){
+				columnArray[i].update();
+			}
+		}
+
+	</script>
+</body>
+
+</html>
